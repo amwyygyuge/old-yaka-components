@@ -24,7 +24,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _moment2.default.locale('zh-cn');
 var format = "YYYY-MM";
-var _DatePicker = function _DatePicker(_ref) {
+var MonthPicker = _datePicker2.default.MonthPicker;
+var _MonthPicker = function _MonthPicker(_ref) {
   var value = _ref.value,
       onChange = _ref.onChange;
 
@@ -32,7 +33,7 @@ var _DatePicker = function _DatePicker(_ref) {
   var resolveOnchange = function resolveOnchange(value) {
     onChange && onChange(value ? (0, _moment2.default)(value).format(format) : undefined);
   };
-  return _react2.default.createElement(_datePicker2.default, { value: _value, onChange: resolveOnchange });
+  return _react2.default.createElement(MonthPicker, { value: _value, onChange: resolveOnchange });
 };
 
-exports.default = _DatePicker;
+exports.default = _MonthPicker;
