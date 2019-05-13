@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.YakaSelect = undefined;
 
+var _message2 = require('igroot/lib/message');
+
+var _message3 = _interopRequireDefault(_message2);
+
 var _select = require('igroot/lib/select');
 
 var _select2 = _interopRequireDefault(_select);
@@ -14,6 +18,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+require('igroot/lib/message/style');
 
 require('igroot/lib/select/style');
 
@@ -81,6 +87,43 @@ var YakaSelect = exports.YakaSelect = function (_Component) {
             } else {
                 return { key: key, label: key };
             }
+        }, _this.copy = function () {
+            var value = _this.props.value;
+
+            try {
+                var dom = document.createElement("input");
+                var _value = _this.tranform_value(value);
+                if (!_value) {
+                    _message3.default.info("空值不可复制！");
+                    return;
+                }
+                var strs = [];
+                if (Array.isArray(_value)) {
+                    if (_value.length === 0) {
+                        _message3.default.info("空值不可复制！");
+                        return;
+                    }
+                    _value.forEach(function (_ref2) {
+                        var label = _ref2.label;
+                        return strs.push(label);
+                    });
+                } else {
+                    strs.push(_value.label);
+                }
+                dom.value = strs.join(",");
+                dom.style.display = "node";
+                document.body.appendChild(dom);
+                dom.select();
+                if (document.execCommand("Copy", "false", null)) {
+                    _message3.default.success("复制成功！");
+                } else {
+                    _message3.default.error("复制失败，原因：浏览器不支持！");
+                }
+
+                document.body.removeChild(dom);
+            } catch (error) {
+                _message3.default.error("复制失败，原因：浏览器不支持！");
+            }
         }, _this.tranform_value = function (value) {
             if (!!value) {
                 if (Array.isArray(value)) {
@@ -110,7 +153,9 @@ var YakaSelect = exports.YakaSelect = function (_Component) {
             var _props = this.props,
                 options = _props.options,
                 value = _props.value,
-                mode = _props.mode;
+                mode = _props.mode,
+                _props$showCopy = _props.showCopy,
+                showCopy = _props$showCopy === undefined ? true : _props$showCopy;
 
             var _value = this.tranform_value(value);
             var _options = [];
@@ -123,7 +168,8 @@ var YakaSelect = exports.YakaSelect = function (_Component) {
                     );
                 });
             }
-            return _react2.default.createElement(
+            var SelectStyle = showCopy ? { width: "calc(100% - 40px)", marginRight: 10 } : { width: "100%" };
+            return [_react2.default.createElement(
                 _select2.default,
                 _extends({
                     showSearch: true,
@@ -132,10 +178,14 @@ var YakaSelect = exports.YakaSelect = function (_Component) {
                 }, this.props, {
                     value: _value,
                     labelInValue: true,
-                    style: { width: '100%' }
+                    style: SelectStyle
                 }),
                 _options
-            );
+            ), showCopy ? _react2.default.createElement(
+                'a',
+                { style: { width: 30 }, onClick: this.copy },
+                '\u590D\u5236'
+            ) : null];
         }
     }]);
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Select } from 'igroot'
+import { Select, message } from 'igroot'
 
 const Option = Select.Option
 
@@ -38,6 +38,42 @@ export class YakaSelect extends Component {
             return { key, label: key }
         }
     }
+    copy = () => {
+        const { value } = this.props
+        try {
+            const dom = document.createElement("input")
+            const _value = this.tranform_value(value)
+            if (!_value) {
+                message.info("空值不可复制！")
+                return
+            }
+            let strs = []
+            if (Array.isArray(_value)) {
+                if (_value.length === 0) {
+                    message.info("空值不可复制！")
+                    return
+                }
+                _value.forEach(({ label }) => strs.push(label))
+            } else {
+                strs.push(_value.label)
+            }
+            dom.value = strs.join(",")
+            dom.style.display = "node"
+            document.body.appendChild(dom)
+            dom.select()
+            if (document.execCommand("Copy", "false", null)) {
+                message.success("复制成功！")
+            } else {
+                message.error("复制失败，原因：浏览器不支持！")
+            }
+
+            document.body.removeChild(dom)
+        } catch (error) {
+            message.error("复制失败，原因：浏览器不支持！")
+
+        }
+
+    }
 
     tranform_value = value => {
         if (!!value) {
@@ -62,7 +98,7 @@ export class YakaSelect extends Component {
     }
 
     render() {
-        const { options, value, mode } = this.props
+        const { options, value, mode, showCopy = true } = this.props
         const _value = this.tranform_value(value)
         let _options = []
         if (options && Array.isArray(options)) {
@@ -70,16 +106,20 @@ export class YakaSelect extends Component {
                 return <Option key={`${option.value}`} value={`${option.value}`}>{option.label}</Option>
             })
         }
-        return <Select
-            showSearch
-            allowClear
-            filterOption={this.handleFilterOption}
-            {...this.props}
-            value={_value}
-            labelInValue
-            style={{ width: '100%' }}
-        >
-            {_options}
-        </Select>
+        const SelectStyle = showCopy ? { width: "calc(100% - 40px)", marginRight: 10 } : { width: "100%" }
+        return [
+            <Select
+                showSearch
+                allowClear
+                filterOption={this.handleFilterOption}
+                {...this.props}
+                value={_value}
+                labelInValue
+                style={SelectStyle}
+            >
+                {_options}
+            </Select>,
+            showCopy ? <a style={{ width: 30 }} onClick={this.copy}>复制</a> : null
+        ]
     }
 }
